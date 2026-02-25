@@ -35,7 +35,7 @@ function App() {
   const [focusModeOpen, setFocusModeOpen] = useState(false)
   const [focusModeIndex, setFocusModeIndex] = useState(0)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isAtBottom, setIsAtBottom] = useState(false)
+  const [isTimerExpanded, setIsTimerExpanded] = useState(false)
   const [timerState, setTimerState] = useState({ timeLeft: 90, isRunning: false })
 
   const currentDay = overrideDay || actualCurrentDay
@@ -43,18 +43,19 @@ function App() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY
-      const windowHeight = window.innerHeight
-      const documentHeight = document.documentElement.scrollHeight
       
       setIsScrolled(scrollTop > 50)
-      setIsAtBottom(scrollTop + windowHeight >= documentHeight - 100)
+      
+      if (isTimerExpanded && scrollTop > 0) {
+        setIsTimerExpanded(false)
+      }
     }
 
     window.addEventListener('scroll', handleScroll)
     handleScroll()
     
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [isTimerExpanded])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -153,7 +154,7 @@ function App() {
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b transition-all duration-300">
         <div className={`max-w-2xl mx-auto px-6 transition-all duration-300 ${isScrolled ? 'py-3' : 'py-6'}`}>
-          <div className={`flex items-center gap-3 mb-4 transition-all duration-300 overflow-hidden ${isScrolled ? 'max-h-0 mb-0 opacity-0' : 'max-h-20 opacity-100'}`}>
+          <div className={`flex items-center gap-3 transition-all duration-300 overflow-hidden ${isScrolled ? 'max-h-0 mb-0 opacity-0' : 'max-h-20 mb-4 opacity-100'}`}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 text-sm text-muted-foreground h-auto p-2 -ml-2">
@@ -193,7 +194,7 @@ function App() {
             )}
           </div>
           
-          <h1 className={`font-bold tracking-tight transition-all duration-300 overflow-hidden ${isScrolled ? 'text-xl mb-2 max-h-8 opacity-0' : 'text-3xl mb-4 max-h-20 opacity-100'}`}>
+          <h1 className={`font-bold tracking-tight transition-all duration-300 overflow-hidden ${isScrolled ? 'text-xl mb-3 max-h-8 opacity-0' : 'text-3xl mb-4 max-h-20 opacity-100'}`}>
             Today's Workout
           </h1>
 
@@ -262,13 +263,16 @@ function App() {
         focusModeOpen ? 'hidden' : ''
       }`}>
         <div className={`max-w-2xl mx-auto px-6 overflow-hidden transition-all duration-300 ${
-          isAtBottom ? 'py-5' : 'py-3'
+          isTimerExpanded ? 'py-5' : 'py-3'
         }`}>
-          {isAtBottom ? (
+          {isTimerExpanded ? (
             <RestTimer ref={timerRef} />
           ) : (
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setIsTimerExpanded(true)}
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              >
                 <div className={`text-2xl font-bold tracking-tighter transition-colors ${
                   timerState.isRunning && timerState.timeLeft <= 5 && timerState.timeLeft > 0
                     ? 'animate-pulse text-destructive'
@@ -278,15 +282,9 @@ function App() {
                   {String(timerState.timeLeft % 60).padStart(2, '0')}
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">Rest Timer</span>
-              </div>
+              </button>
               <Button
-                onClick={() => {
-                  if (timerState.isRunning) {
-                    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })
-                  } else {
-                    timerRef.current?.start()
-                  }
-                }}
+                onClick={() => timerRef.current?.toggle()}
                 size="sm"
                 className={timerState.isRunning ? "bg-accent hover:bg-accent/90" : ""}
               >
