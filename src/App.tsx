@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Barbell, CalendarDots, Info, CaretDown } from '@phosphor-icons/react'
+import { Barbell, CalendarDots, Info, CaretDown, Play, Pause } from '@phosphor-icons/react'
 import { ExerciseCard } from '@/components/ExerciseCard'
 import { TreadmillCard } from '@/components/TreadmillCard'
 import { MiniTimer } from '@/components/MiniTimer'
@@ -34,8 +34,40 @@ function App() {
   const [overrideDay, setOverrideDay] = useKV<string | null>('day-override', null)
   const [focusModeOpen, setFocusModeOpen] = useState(false)
   const [focusModeIndex, setFocusModeIndex] = useState(0)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isAtBottom, setIsAtBottom] = useState(false)
+  const [timerState, setTimerState] = useState({ timeLeft: 90, isRunning: false })
 
   const currentDay = overrideDay || actualCurrentDay
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY
+      const windowHeight = window.innerHeight
+      const documentHeight = document.documentElement.scrollHeight
+      
+      setIsScrolled(scrollTop > 50)
+      setIsAtBottom(scrollTop + windowHeight >= documentHeight - 100)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    handleScroll()
+    
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (timerRef.current) {
+        setTimerState({
+          timeLeft: timerRef.current.timeLeft,
+          isRunning: timerRef.current.isRunning
+        })
+      }
+    }, 100)
+    
+    return () => clearInterval(interval)
+  }, [])
 
   const todayWorkout = useMemo(() => {
     return gymRoutine.rutina.find((workout) => workout.dia === currentDay)
@@ -119,9 +151,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
-        <div className="max-w-2xl mx-auto px-6 py-6">
-          <div className="flex items-center gap-3 mb-4">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b transition-all duration-300">
+        <div className={`max-w-2xl mx-auto px-6 transition-all duration-300 ${isScrolled ? 'py-3' : 'py-6'}`}>
+          <div className={`flex items-center gap-3 mb-4 transition-all duration-300 overflow-hidden ${isScrolled ? 'max-h-0 mb-0 opacity-0' : 'max-h-20 opacity-100'}`}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 text-sm text-muted-foreground h-auto p-2 -ml-2">
@@ -161,12 +193,12 @@ function App() {
             )}
           </div>
           
-          <h1 className="text-3xl font-bold tracking-tight mb-4">
+          <h1 className={`font-bold tracking-tight transition-all duration-300 overflow-hidden ${isScrolled ? 'text-xl mb-2 max-h-8 opacity-0' : 'text-3xl mb-4 max-h-20 opacity-100'}`}>
             Today's Workout
           </h1>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
+            <div className={`flex items-center justify-between text-sm transition-all duration-300 ${isScrolled ? 'opacity-0 max-h-0 overflow-hidden' : 'opacity-100 max-h-10'}`}>
               <span className="font-medium text-muted-foreground">Progress</span>
               <span className="font-bold text-foreground">
                 {progressStats.completed} / {progressStats.total} items
@@ -177,7 +209,7 @@ function App() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-6">
+      <div className={`max-w-2xl mx-auto px-6 py-6 ${focusModeOpen ? '' : 'pb-24'}`}>
         <div className="flex flex-col gap-4">
           <TreadmillCard
             isCompleted={treadmillCompleted || false}
@@ -226,9 +258,54 @@ function App() {
         )}
       />
 
-    <div>
-    { !focusModeOpen && <RestTimer ref={timerRef} className="fixed bottom-0 w-full rigth-0 z-50 bg-white p-5" /> }
-    </div>
+      <div className={`fixed bottom-0 w-full z-50 bg-card border-t transition-all duration-300 ${
+        focusModeOpen ? 'hidden' : ''
+      }`}>
+        <div className={`max-w-2xl mx-auto px-6 overflow-hidden transition-all duration-300 ${
+          isAtBottom ? 'py-5' : 'py-3'
+        }`}>
+          {isAtBottom ? (
+            <RestTimer ref={timerRef} />
+          ) : (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`text-2xl font-bold tracking-tighter transition-colors ${
+                  timerState.isRunning && timerState.timeLeft <= 5 && timerState.timeLeft > 0
+                    ? 'animate-pulse text-destructive'
+                    : ''
+                }`}>
+                  {String(Math.floor(timerState.timeLeft / 60)).padStart(2, '0')}:
+                  {String(timerState.timeLeft % 60).padStart(2, '0')}
+                </div>
+                <span className="text-sm font-medium text-muted-foreground">Rest Timer</span>
+              </div>
+              <Button
+                onClick={() => {
+                  if (timerState.isRunning) {
+                    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })
+                  } else {
+                    timerRef.current?.start()
+                  }
+                }}
+                size="sm"
+                className={timerState.isRunning ? "bg-accent hover:bg-accent/90" : ""}
+              >
+                {timerState.isRunning ? (
+                  <>
+                    <Pause className="mr-2" size={16} weight="fill" />
+                    Pause
+                  </>
+                ) : (
+                  <>
+                    <Play className="mr-2" size={16} weight="fill" />
+                    Start
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
     
 
       <Dialog open={showDayNoteDialog} onOpenChange={setShowDayNoteDialog}>
