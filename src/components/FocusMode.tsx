@@ -3,6 +3,7 @@ import { motion, AnimatePresence, PanInfo, useMotionValue } from 'framer-motion'
 import { X, CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { MiniTimer, type MiniTimerRef } from '@/components/MiniTimer'
 import type { Exercise } from '@/types/routine'
 
 interface FocusModeProps {
@@ -16,6 +17,7 @@ interface FocusModeProps {
   onSetToggle: (exerciseIndex: number, setIndex: number) => void
   renderTreadmill: () => React.ReactNode
   renderExercise: (exercise: Exercise, index: number) => React.ReactNode
+  timerRef: React.RefObject<MiniTimerRef | null>
 }
 
 export function FocusMode({
@@ -25,6 +27,7 @@ export function FocusMode({
   exercises,
   renderTreadmill,
   renderExercise,
+  timerRef,
 }: FocusModeProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const x = useMotionValue(0)
@@ -102,8 +105,11 @@ export function FocusMode({
             <X size={20} weight="bold" />
             Exit Focus
           </Button>
-          <div className="text-sm font-medium text-muted-foreground">
-            {currentIndex + 1} / {totalCards}
+          <div className="flex items-center gap-3">
+            {currentIndex > 0 && <MiniTimer ref={timerRef} />}
+            <div className="text-sm font-medium text-muted-foreground">
+              {currentIndex + 1} / {totalCards}
+            </div>
           </div>
         </div>
 

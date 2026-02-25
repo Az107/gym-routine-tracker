@@ -20,8 +20,7 @@ import {
 import { Barbell, CalendarDots, Info, CaretDown } from '@phosphor-icons/react'
 import { ExerciseCard } from '@/components/ExerciseCard'
 import { TreadmillCard } from '@/components/TreadmillCard'
-import { RestTimer, type RestTimerRef } from '@/components/RestTimer'
-import { FullscreenTimer } from '@/components/FullscreenTimer'
+import { MiniTimer, type MiniTimerRef } from '@/components/MiniTimer'
 import { FocusMode } from '@/components/FocusMode'
 import { gymRoutine } from '@/data/routine'
 import type { SetCompletion } from '@/types/routine'
@@ -29,7 +28,7 @@ import type { SetCompletion } from '@/types/routine'
 function App() {
   const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
   const actualCurrentDay = dayNames[new Date().getDay()]
-  const timerRef = useRef<RestTimerRef>(null)
+  const timerRef = useRef<MiniTimerRef>(null)
   const [showDayNoteDialog, setShowDayNoteDialog] = useState(false)
   const [overrideDay, setOverrideDay] = useKV<string | null>('day-override', null)
   const [focusModeOpen, setFocusModeOpen] = useState(false)
@@ -118,7 +117,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
         <div className="max-w-2xl mx-auto px-6 py-6">
           <div className="flex items-center gap-3 mb-4">
@@ -178,7 +177,7 @@ function App() {
       </div>
 
       <div className="max-w-2xl mx-auto px-6 py-6">
-        <div className="flex flex-col gap-4 mb-32">
+        <div className="flex flex-col gap-4">
           <TreadmillCard
             isCompleted={treadmillCompleted || false}
             onComplete={setTreadmillCompleted}
@@ -198,12 +197,6 @@ function App() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg">
-        <div className="max-w-2xl mx-auto px-6 py-6">
-          <FullscreenTimer timerRef={timerRef} />
-        </div>
-      </div>
-
       <FocusMode
         isOpen={focusModeOpen}
         onClose={() => setFocusModeOpen(false)}
@@ -213,6 +206,7 @@ function App() {
         onTreadmillComplete={setTreadmillCompleted}
         completedSets={completion || {}}
         onSetToggle={handleSetToggle}
+        timerRef={timerRef}
         renderTreadmill={() => (
           <TreadmillCard
             isCompleted={treadmillCompleted || false}
