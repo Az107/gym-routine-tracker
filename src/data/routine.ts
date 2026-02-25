@@ -4,8 +4,8 @@ export const gymRoutine: Routine = {
   rutina: [
     {
       dia: "Lunes",
-      grupo_muscular: "Empuje (Pecho + Tríceps)",
-      nota: "Prioriza técnica en press banca, no carga",
+      grupo_muscular: "Empuje",
+      nota: "Pecho y Tríceps, prioriza técnica en press banca, no carga",
       ejercicios: [
         { nombre: "Press banca", series: 4, repeticiones: 8, nota: "Peso controlado, aprende el movimiento" },
         { nombre: "Press banca inclinado mancuernas", series: 3, repeticiones: 10 },
@@ -16,8 +16,8 @@ export const gymRoutine: Routine = {
     },
     {
       dia: "Martes",
-      grupo_muscular: "Tirón (Espalda + Bíceps)",
-      nota: "El remo es tu ejercicio más importante para los dolores de espalda",
+      grupo_muscular: "Tirón",
+      nota: "Espalda y Bíceps, el remo es tu ejercicio más importante para los dolores de espalda",
       ejercicios: [
         { nombre: "Remo polea baja", series: 4, repeticiones: 10, nota: "Ejercicio clave postural" },
         { nombre: "Jalones al pecho agarre medio", series: 4, repeticiones: 10 },
@@ -62,7 +62,7 @@ export const gymRoutine: Routine = {
         { nombre: "Tríceps francés mancuerna", series: 3, repeticiones: 12 },
         { nombre: "Fondos en banco", series: 3, repeticiones: 12 },
         { nombre: "Bíceps concentrado", series: 3, repeticiones: 12 },
-        { nombre: "Cinta o bici estática", series: 1, repeticiones: "10 minutos ritmo suave", nota: "Para activar circulación, no para quemar" }
+        { nombre: "Bici estática", series: 1, repeticiones: "10 minutos ritmo suave", nota: "Para activar circulación, no para quemar" }
       ]
     }
   ]

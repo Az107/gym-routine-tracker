@@ -184,13 +184,6 @@ export const RestTimer = forwardRef<RestTimerRef, RestTimerProps>(({ defaultDura
             <div className="flex flex-col items-center gap-2">
               <Label htmlFor="custom-minutes" className="text-sm font-medium">Minutes</Label>
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setCustomMinutes((prev) => Math.max(0, prev - 1))}
-                >
-                  <span className="text-lg">−</span>
-                </Button>
                 <input
                   id="custom-minutes"
                   type="number"
@@ -200,26 +193,12 @@ export const RestTimer = forwardRef<RestTimerRef, RestTimerProps>(({ defaultDura
                   onChange={(e) => setCustomMinutes(Math.max(0, Math.min(99, parseInt(e.target.value) || 0)))}
                   className="w-20 text-center text-2xl font-bold bg-secondary rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
                 />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setCustomMinutes((prev) => Math.min(99, prev + 1))}
-                >
-                  <span className="text-lg">+</span>
-                </Button>
               </div>
             </div>
             <span className="text-3xl font-bold text-muted-foreground">:</span>
             <div className="flex flex-col items-center gap-2">
               <Label htmlFor="custom-seconds" className="text-sm font-medium">Seconds</Label>
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setCustomSeconds((prev) => Math.max(0, prev - 15))}
-                >
-                  <span className="text-lg">−</span>
-                </Button>
                 <input
                   id="custom-seconds"
                   type="number"
@@ -230,13 +209,6 @@ export const RestTimer = forwardRef<RestTimerRef, RestTimerProps>(({ defaultDura
                   onChange={(e) => setCustomSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
                   className="w-20 text-center text-2xl font-bold bg-secondary rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
                 />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setCustomSeconds((prev) => Math.min(59, prev + 15))}
-                >
-                  <span className="text-lg">+</span>
-                </Button>
               </div>
             </div>
           </div>
