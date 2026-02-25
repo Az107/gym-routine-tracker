@@ -116,7 +116,7 @@ function App() {
       </div>
 
       <div className="max-w-2xl mx-auto px-6 py-6">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mb-32">
           {todayWorkout.ejercicios.map((exercise, index) => (
             <ExerciseCard
               key={index}
@@ -128,6 +128,7 @@ function App() {
           ))}
         </div>
       </div>
+
 
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg">
         <div className="max-w-2xl mx-auto px-6 py-6">
