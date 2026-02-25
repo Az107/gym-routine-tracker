@@ -1,10 +1,17 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Card } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Barbell, CalendarDots } from '@phosphor-icons/react'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Barbell, CalendarDots, Info } from '@phosphor-icons/react'
 import { ExerciseCard } from '@/components/ExerciseCard'
 import { RestTimer, type RestTimerRef } from '@/components/RestTimer'
 import { gymRoutine } from '@/data/routine'
@@ -14,6 +21,7 @@ function App() {
   const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
   const currentDay = dayNames[new Date().getDay()]
   const timerRef = useRef<RestTimerRef>(null)
+  const [showDayNoteDialog, setShowDayNoteDialog] = useState(false)
 
   const todayWorkout = useMemo(() => {
     return gymRoutine.rutina.find((workout) => workout.dia === currentDay)
@@ -97,6 +105,16 @@ function App() {
               <Barbell size={14} className="mr-1.5" weight="fill" />
               {todayWorkout.grupo_muscular}
             </Badge>
+            {todayWorkout.nota && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 ml-auto"
+                onClick={() => setShowDayNoteDialog(true)}
+              >
+                <Info size={18} className="text-primary" weight="fill" />
+              </Button>
+            )}
           </div>
           
           <h1 className="text-3xl font-bold tracking-tight mb-4">
@@ -129,12 +147,22 @@ function App() {
         </div>
       </div>
 
-
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg">
         <div className="max-w-2xl mx-auto px-6 py-6">
           <RestTimer ref={timerRef} />
         </div>
       </div>
+
+      <Dialog open={showDayNoteDialog} onOpenChange={setShowDayNoteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{todayWorkout.grupo_muscular}</DialogTitle>
+            <DialogDescription className="text-base pt-2">
+              {todayWorkout.nota}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
