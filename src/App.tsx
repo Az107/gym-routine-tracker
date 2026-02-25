@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -6,13 +6,14 @@ import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Barbell, CalendarDots } from '@phosphor-icons/react'
 import { ExerciseCard } from '@/components/ExerciseCard'
-import { RestTimer } from '@/components/RestTimer'
+import { RestTimer, type RestTimerRef } from '@/components/RestTimer'
 import { gymRoutine } from '@/data/routine'
 import type { SetCompletion } from '@/types/routine'
 
 function App() {
   const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
   const currentDay = dayNames[new Date().getDay()]
+  const timerRef = useRef<RestTimerRef>(null)
 
   const todayWorkout = useMemo(() => {
     return gymRoutine.rutina.find((workout) => workout.dia === currentDay)
@@ -38,7 +39,13 @@ function App() {
         newCompletion[exerciseIndex] = Array(todayWorkout?.ejercicios[exerciseIndex].series || 0).fill(false)
       }
       newCompletion[exerciseIndex] = [...newCompletion[exerciseIndex]]
+      const wasCompleted = newCompletion[exerciseIndex][setIndex]
       newCompletion[exerciseIndex][setIndex] = !newCompletion[exerciseIndex][setIndex]
+      
+      if (!wasCompleted && newCompletion[exerciseIndex][setIndex]) {
+        timerRef.current?.start()
+      }
+      
       return newCompletion
     })
   }
@@ -124,7 +131,7 @@ function App() {
 
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg">
         <div className="max-w-2xl mx-auto px-6 py-6">
-          <RestTimer />
+          <RestTimer ref={timerRef} />
         </div>
       </div>
     </div>

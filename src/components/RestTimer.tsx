@@ -1,5 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
+import { useKV } from '@github/spark/hooks'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import { Play, Pause, ArrowCounterClockwise } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
@@ -9,10 +12,24 @@ interface RestTimerProps {
   className?: string
 }
 
-export function RestTimer({ defaultDuration = 90, onComplete, className }: RestTimerProps) {
+export interface RestTimerRef {
+  start: () => void
+}
+
+export const RestTimer = forwardRef<RestTimerRef, RestTimerProps>(({ defaultDuration = 90, onComplete, className }, ref) => {
   const [timeLeft, setTimeLeft] = useState(defaultDuration)
   const [isRunning, setIsRunning] = useState(false)
   const [duration, setDuration] = useState(defaultDuration)
+  const [autoStart, setAutoStart] = useKV<boolean>('rest-timer-auto-start', false)
+
+  useImperativeHandle(ref, () => ({
+    start: () => {
+      if (autoStart) {
+        setTimeLeft(duration)
+        setIsRunning(true)
+      }
+    }
+  }), [autoStart, duration])
 
   useEffect(() => {
     let interval: number | undefined
@@ -118,6 +135,20 @@ export function RestTimer({ defaultDuration = 90, onComplete, className }: RestT
           <ArrowCounterClockwise />
         </Button>
       </div>
+
+      <div className="flex items-center gap-2">
+        <Checkbox
+          id="auto-start-timer"
+          checked={autoStart}
+          onCheckedChange={(checked) => setAutoStart((prev) => !!checked)}
+        />
+        <Label
+          htmlFor="auto-start-timer"
+          className="text-sm font-medium cursor-pointer select-none"
+        >
+          Auto-start timer after completing each set
+        </Label>
+      </div>
     </div>
   )
-}
+})
