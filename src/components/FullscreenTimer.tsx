@@ -14,17 +14,9 @@ export function FullscreenTimer({ timerRef }: FullscreenTimerProps) {
   return (
     <>
       <div className="flex items-center gap-3">
-        <div className="flex-1">
+        <div className="flex-1" onClick={() => setIsFullscreen(false)}>
           <RestTimer ref={timerRef} />
         </div>
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={() => setIsFullscreen(true)}
-          className="h-14 w-14 p-0 shrink-0"
-        >
-          <ArrowsOut size={24} />
-        </Button>
       </div>
 
       <AnimatePresence>
