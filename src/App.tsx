@@ -11,7 +11,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Barbell, CalendarDots, Info } from '@phosphor-icons/react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Barbell, CalendarDots, Info, CaretDown } from '@phosphor-icons/react'
 import { ExerciseCard } from '@/components/ExerciseCard'
 import { RestTimer, type RestTimerRef } from '@/components/RestTimer'
 import { gymRoutine } from '@/data/routine'
@@ -19,9 +25,12 @@ import type { SetCompletion } from '@/types/routine'
 
 function App() {
   const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
-  const currentDay = dayNames[new Date().getDay()]
+  const actualCurrentDay = dayNames[new Date().getDay()]
   const timerRef = useRef<RestTimerRef>(null)
   const [showDayNoteDialog, setShowDayNoteDialog] = useState(false)
+  const [overrideDay, setOverrideDay] = useKV<string | null>('day-override', null)
+
+  const currentDay = overrideDay || actualCurrentDay
 
   const todayWorkout = useMemo(() => {
     return gymRoutine.rutina.find((workout) => workout.dia === currentDay)
@@ -97,10 +106,29 @@ function App() {
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
         <div className="max-w-2xl mx-auto px-6 py-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CalendarDots size={18} />
-              <span className="font-medium">{currentDay}</span>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2 text-sm text-muted-foreground h-auto p-2 -ml-2">
+                  <CalendarDots size={18} />
+                  <span className="font-medium">{currentDay}</span>
+                  <CaretDown size={14} weight="bold" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                {gymRoutine.rutina.map((workout) => (
+                  <DropdownMenuItem
+                    key={workout.dia}
+                    onClick={() => setOverrideDay(workout.dia === actualCurrentDay ? null : workout.dia)}
+                    className="flex items-center justify-between"
+                  >
+                    <span>{workout.dia}</span>
+                    {workout.dia === actualCurrentDay && (
+                      <Badge variant="secondary" className="ml-2 text-xs">Today</Badge>
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Badge variant="secondary" className="font-semibold">
               <Barbell size={14} className="mr-1.5" weight="fill" />
               {todayWorkout.grupo_muscular}
