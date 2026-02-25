@@ -21,6 +21,8 @@ import { Barbell, CalendarDots, Info, CaretDown } from '@phosphor-icons/react'
 import { ExerciseCard } from '@/components/ExerciseCard'
 import { TreadmillCard } from '@/components/TreadmillCard'
 import { RestTimer, type RestTimerRef } from '@/components/RestTimer'
+import { FullscreenTimer } from '@/components/FullscreenTimer'
+import { FocusMode } from '@/components/FocusMode'
 import { gymRoutine } from '@/data/routine'
 import type { SetCompletion } from '@/types/routine'
 
@@ -30,6 +32,8 @@ function App() {
   const timerRef = useRef<RestTimerRef>(null)
   const [showDayNoteDialog, setShowDayNoteDialog] = useState(false)
   const [overrideDay, setOverrideDay] = useKV<string | null>('day-override', null)
+  const [focusModeOpen, setFocusModeOpen] = useState(false)
+  const [focusModeIndex, setFocusModeIndex] = useState(0)
 
   const currentDay = overrideDay || actualCurrentDay
 
@@ -71,6 +75,11 @@ function App() {
       
       return newCompletion
     })
+  }
+
+  const handleCardClick = (index: number) => {
+    setFocusModeIndex(index)
+    setFocusModeOpen(true)
   }
 
   const progressStats = useMemo(() => {
@@ -173,6 +182,7 @@ function App() {
           <TreadmillCard
             isCompleted={treadmillCompleted || false}
             onComplete={setTreadmillCompleted}
+            onCardClick={() => handleCardClick(0)}
           />
           
           {todayWorkout.ejercicios.map((exercise, index) => (
@@ -182,6 +192,7 @@ function App() {
               exerciseIndex={index}
               completedSets={(completion && completion[index]) || Array(exercise.series).fill(false)}
               onSetToggle={(setIndex) => handleSetToggle(index, setIndex)}
+              onCardClick={() => handleCardClick(index + 1)}
             />
           ))}
         </div>
@@ -189,9 +200,36 @@ function App() {
 
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg">
         <div className="max-w-2xl mx-auto px-6 py-6">
-          <RestTimer ref={timerRef} />
+          <FullscreenTimer timerRef={timerRef} />
         </div>
       </div>
+
+      <FocusMode
+        isOpen={focusModeOpen}
+        onClose={() => setFocusModeOpen(false)}
+        initialIndex={focusModeIndex}
+        exercises={todayWorkout.ejercicios}
+        treadmillCompleted={treadmillCompleted || false}
+        onTreadmillComplete={setTreadmillCompleted}
+        completedSets={completion || {}}
+        onSetToggle={handleSetToggle}
+        renderTreadmill={() => (
+          <TreadmillCard
+            isCompleted={treadmillCompleted || false}
+            onComplete={setTreadmillCompleted}
+            isInFocusMode
+          />
+        )}
+        renderExercise={(exercise, index) => (
+          <ExerciseCard
+            exercise={exercise}
+            exerciseIndex={index}
+            completedSets={(completion && completion[index]) || Array(exercise.series).fill(false)}
+            onSetToggle={(setIndex) => handleSetToggle(index, setIndex)}
+            isInFocusMode
+          />
+        )}
+      />
 
       <Dialog open={showDayNoteDialog} onOpenChange={setShowDayNoteDialog}>
         <DialogContent>

@@ -7,9 +7,11 @@ import { cn } from '@/lib/utils'
 interface TreadmillCardProps {
   isCompleted: boolean
   onComplete: (completed: boolean) => void
+  onCardClick?: () => void
+  isInFocusMode?: boolean
 }
 
-export function TreadmillCard({ isCompleted, onComplete }: TreadmillCardProps) {
+export function TreadmillCard({ isCompleted, onComplete, onCardClick, isInFocusMode = false }: TreadmillCardProps) {
   const defaultDuration = 10 * 60
   const [timeLeft, setTimeLeft] = useState(defaultDuration)
   const [isRunning, setIsRunning] = useState(false)
@@ -60,8 +62,11 @@ export function TreadmillCard({ isCompleted, onComplete }: TreadmillCardProps) {
   return (
     <Card className={cn(
       "p-6 transition-all duration-300 relative overflow-hidden",
-      isCompleted && "bg-accent/5 border-accent/20"
-    )}>
+      isCompleted && "bg-accent/5 border-accent/20",
+      !isInFocusMode && onCardClick && "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+    )}
+    onClick={() => !isInFocusMode && onCardClick?.()}
+    >
       <div 
         className="absolute bottom-0 left-0 h-1 bg-accent transition-all duration-300"
         style={{ width: `${progress}%` }}

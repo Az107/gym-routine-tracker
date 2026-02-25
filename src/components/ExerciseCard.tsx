@@ -17,12 +17,16 @@ interface ExerciseCardProps {
   exerciseIndex: number
   completedSets: boolean[]
   onSetToggle: (setIndex: number) => void
+  onCardClick?: () => void
+  isInFocusMode?: boolean
 }
 
 export function ExerciseCard({ 
   exercise, 
   completedSets, 
-  onSetToggle 
+  onSetToggle,
+  onCardClick,
+  isInFocusMode = false
 }: ExerciseCardProps) {
   const [showNoteDialog, setShowNoteDialog] = useState(false)
   const allSetsCompleted = completedSets.every((completed) => completed)
@@ -30,10 +34,14 @@ export function ExerciseCard({
 
   return (
     <>
-      <Card className={cn(
-        "p-6 transition-all duration-300",
-        allSetsCompleted && "bg-accent/5 border-accent/20"
-      )}>
+      <Card 
+        className={cn(
+          "p-6 transition-all duration-300",
+          allSetsCompleted && "bg-accent/5 border-accent/20",
+          !isInFocusMode && onCardClick && "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+        )}
+        onClick={() => !isInFocusMode && onCardClick?.()}
+      >
         <div className="flex flex-col gap-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
