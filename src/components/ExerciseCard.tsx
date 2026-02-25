@@ -40,13 +40,12 @@ export function ExerciseCard({
           allSetsCompleted && "bg-accent/5 border-accent/20",
           !isInFocusMode && onCardClick && "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
         )}
-        onClick={() => !isInFocusMode && onCardClick?.()}
       >
         <div className="flex flex-col gap-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-start gap-2">
-                <h3 className="text-lg font-medium leading-tight flex-1">
+                <h3   onClick={() => !isInFocusMode && onCardClick?.()} className="text-lg font-medium leading-tight flex-1">
                   {exercise.nombre}
                 </h3>
                 {exercise.nota && (

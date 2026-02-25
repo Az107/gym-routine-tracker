@@ -20,7 +20,8 @@ import {
 import { Barbell, CalendarDots, Info, CaretDown } from '@phosphor-icons/react'
 import { ExerciseCard } from '@/components/ExerciseCard'
 import { TreadmillCard } from '@/components/TreadmillCard'
-import { MiniTimer, type MiniTimerRef } from '@/components/MiniTimer'
+import { MiniTimer } from '@/components/MiniTimer'
+import {RestTimer, type RestTimerRef} from '@/components/RestTimer'
 import { FocusMode } from '@/components/FocusMode'
 import { gymRoutine } from '@/data/routine'
 import type { SetCompletion } from '@/types/routine'
@@ -28,7 +29,7 @@ import type { SetCompletion } from '@/types/routine'
 function App() {
   const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
   const actualCurrentDay = dayNames[new Date().getDay()]
-  const timerRef = useRef<MiniTimerRef>(null)
+  const timerRef = useRef<RestTimerRef>(null)
   const [showDayNoteDialog, setShowDayNoteDialog] = useState(false)
   const [overrideDay, setOverrideDay] = useKV<string | null>('day-override', null)
   const [focusModeOpen, setFocusModeOpen] = useState(false)
@@ -224,6 +225,11 @@ function App() {
           />
         )}
       />
+
+    <div>
+    { !focusModeOpen && <RestTimer ref={timerRef} className="fixed bottom-0 w-full rigth-0 z-50 bg-white p-5" /> }
+    </div>
+    
 
       <Dialog open={showDayNoteDialog} onOpenChange={setShowDayNoteDialog}>
         <DialogContent>

@@ -65,7 +65,7 @@ export function TreadmillCard({ isCompleted, onComplete, onCardClick, isInFocusM
       isCompleted && "bg-accent/5 border-accent/20",
       !isInFocusMode && onCardClick && "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
     )}
-    onClick={() => !isInFocusMode && onCardClick?.()}
+
     >
       <div 
         className="absolute bottom-0 left-0 h-1 bg-accent transition-all duration-300"
@@ -76,11 +76,11 @@ export function TreadmillCard({ isCompleted, onComplete, onCardClick, isInFocusM
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center text-accent-foreground text-lg">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-secundary to-primary/80 flex items-center justify-center text-accent-foreground text-lg">
                 🏃
               </div>
               <div>
-                <h3 className="text-lg font-semibold leading-tight">
+                <h3   onClick={() => !isInFocusMode && onCardClick?.()} className="text-lg font-semibold leading-tight">
                   Treadmill Warmup
                 </h3>
                 <p className="text-sm text-muted-foreground">
