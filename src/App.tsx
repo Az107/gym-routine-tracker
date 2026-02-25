@@ -61,8 +61,8 @@ function App() {
     const interval = setInterval(() => {
       if (timerRef.current) {
         setTimerState({
-          timeLeft: timerRef.current.timeLeft,
-          isRunning: timerRef.current.isRunning
+          timeLeft: timerRef.current.getTimeLeft(),
+          isRunning: timerRef.current.getIsRunning()
         })
       }
     }, 100)

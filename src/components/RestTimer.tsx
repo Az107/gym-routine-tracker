@@ -22,8 +22,8 @@ interface RestTimerProps {
 export interface RestTimerRef {
   start: () => void
   toggle: () => void
-  timeLeft: number
-  isRunning: boolean
+  getTimeLeft: () => number
+  getIsRunning: () => boolean
 }
 
 export const RestTimer = forwardRef<RestTimerRef, RestTimerProps>(({ defaultDuration = 90, onComplete, className }, ref) => {
@@ -50,8 +50,8 @@ export const RestTimer = forwardRef<RestTimerRef, RestTimerProps>(({ defaultDura
         return !prev
       })
     },
-    timeLeft,
-    isRunning,
+    getTimeLeft: () => timeLeft,
+    getIsRunning: () => isRunning,
   }), [autoStart, duration, timeLeft, isRunning])
 
   useEffect(() => {

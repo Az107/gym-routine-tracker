@@ -2,6 +2,7 @@ import {useEffect, useImperativeHandle, forwardRef } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Timer } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
+import type { RestTimerRef } from '@/components/RestTimer'
 
 interface MiniTimerProps {
   defaultDuration?: number
@@ -13,9 +14,9 @@ interface MiniTimerProps {
 export const MiniTimer = (props: {ref: RestTimerRef }) => {
 
 
-  const minutes = Math.floor(props.ref.timeLeft / 60)
-  const seconds = props.ref.timeLeft % 60
-  const isWarning = props.ref.timeLeft <= 5 && props.ref.timeLeft > 0 && props.ref.isRunning
+  const minutes = Math.floor(props.ref.getTimeLeft() / 60)
+  const seconds = props.ref.getTimeLeft() % 60
+  const isWarning = props.ref.getTimeLeft() <= 5 && props.ref.getTimeLeft() > 0 && props.ref.getIsRunning()
 
   return (
     <div 
