@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Barbell, CalendarDots, Info, CaretDown } from '@phosphor-icons/react'
 import { ExerciseCard } from '@/components/ExerciseCard'
+import { TreadmillCard } from '@/components/TreadmillCard'
 import { RestTimer, type RestTimerRef } from '@/components/RestTimer'
 import { gymRoutine } from '@/data/routine'
 import type { SetCompletion } from '@/types/routine'
@@ -49,6 +50,11 @@ function App() {
     initialCompletion
   )
 
+  const [treadmillCompleted, setTreadmillCompleted] = useKV<boolean>(
+    `treadmill-completion-${currentDay}`,
+    false
+  )
+
   const handleSetToggle = (exerciseIndex: number, setIndex: number) => {
     setCompletion((currentCompletion) => {
       const newCompletion = { ...currentCompletion }
@@ -70,18 +76,19 @@ function App() {
   const progressStats = useMemo(() => {
     if (!todayWorkout || !completion) return { completed: 0, total: 0, percentage: 0 }
     
-    const total = todayWorkout.ejercicios.reduce((sum, exercise) => sum + exercise.series, 0)
-    const completed = Object.values(completion).reduce(
+    const total = todayWorkout.ejercicios.reduce((sum, exercise) => sum + exercise.series, 0) + 1
+    const exercisesCompleted = Object.values(completion).reduce(
       (sum, sets) => sum + sets.filter((s: boolean) => s).length,
       0
     )
+    const completed = exercisesCompleted + (treadmillCompleted ? 1 : 0)
     
     return {
       completed,
       total,
       percentage: total > 0 ? Math.round((completed / total) * 100) : 0
     }
-  }, [todayWorkout, completion])
+  }, [todayWorkout, completion, treadmillCompleted])
 
   if (!todayWorkout) {
     return (
@@ -153,7 +160,7 @@ function App() {
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-muted-foreground">Progress</span>
               <span className="font-bold text-foreground">
-                {progressStats.completed} / {progressStats.total} sets
+                {progressStats.completed} / {progressStats.total} items
               </span>
             </div>
             <Progress value={progressStats.percentage} className="h-2" />
@@ -163,6 +170,11 @@ function App() {
 
       <div className="max-w-2xl mx-auto px-6 py-6">
         <div className="flex flex-col gap-4 mb-32">
+          <TreadmillCard
+            isCompleted={treadmillCompleted || false}
+            onComplete={setTreadmillCompleted}
+          />
+          
           {todayWorkout.ejercicios.map((exercise, index) => (
             <ExerciseCard
               key={index}
