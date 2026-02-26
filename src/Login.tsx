@@ -1,82 +1,62 @@
 import "./index.css";
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-import App from "./App";
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY,
-);
+import { useNavigate } from "react-router";
+import { supabase } from "./lib/utils";
 
 export default function Login() {
+  let navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [claims, setClaims] = useState(null);
-
-  // Check URL params on initial render
-  const params = new URLSearchParams(window.location.search);
-  const hasTokenHash = params.get("token_hash");
-
-  const [verifying, setVerifying] = useState(!!hasTokenHash);
-  const [authError, setAuthError] = useState(null);
-  const [authSuccess, setAuthSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    // Check if we have token_hash in URL (magic link callback)
-    const params = new URLSearchParams(window.location.search);
-    const token_hash = params.get("token_hash");
-    const type = params.get("type");
-
-    if (token_hash) {
-      // Verify the OTP token
-      supabase.auth
-        .verifyOtp({
-          token_hash,
-          type: type || "email",
-        })
-        .then(({ error }) => {
-          if (error) {
-            setAuthError(error.message);
-          } else {
-            setAuthSuccess(true);
-            // Clear URL params
-            window.history.replaceState({}, document.title, "/");
-          }
-          setVerifying(false);
-        });
-    }
-
-    // Check for existing session using getClaims
-    supabase.auth.getClaims().then(({ data: { claims } }) => {
-      setClaims(claims);
+    // Check existing session
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setClaims(user);
     });
 
-    // Listen for auth changes
+    // Listen for auth state changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      supabase.auth.getClaims().then(({ data: { claims } }) => {
-        setClaims(claims);
-      });
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setClaims(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
+    setErrorMsg("");
+
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
+      password,
     });
-    if (error) {
-      alert(error.error_description || error.message);
-    } else {
-      alert("Check your email for the login link!");
-    }
+
+    if (error) setErrorMsg(error.message);
+    else setClaims(data.user);
+
+    setLoading(false);
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg("");
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) setErrorMsg(error.message);
+    else alert("Account created! Please check your email to verify it.");
+
     setLoading(false);
   };
 
@@ -85,69 +65,61 @@ export default function Login() {
     setClaims(null);
   };
 
-  // Show verification state
-  if (verifying) {
-    return (
-      <div>
-        <h1>Authentication</h1>
-        <p>Confirming your magic link...</p>
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  // Show auth error
-  if (authError) {
-    return (
-      <div>
-        <h1>Authentication</h1>
-        <p>✗ Authentication failed</p>
-        <p>{authError}</p>
-        <button
-          onClick={() => {
-            setAuthError(null);
-            window.history.replaceState({}, document.title, "/");
-          }}
-        >
-          Return to login
-        </button>
-      </div>
-    );
-  }
-
-  // Show auth success (briefly before claims load)
-  if (authSuccess && !claims) {
-    return (
-      <div>
-        <h1>Authentication</h1>
-        <p>✓ Authentication successful!</p>
-        <p>Loading your account...</p>
-      </div>
-    );
-  }
-
-  // If user is logged in, show welcome screen
   if (claims) {
-    return <App />;
+    navigate("/login");
   }
 
-  // Show login form
   return (
-    <div>
-      <h1>Supabase + React</h1>
-      <p>Sign in via magic link with your email below</p>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Your email"
-          value={email}
-          required={true}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <button disabled={loading}>
-          {loading ? <span>Loading</span> : <span>Send magic link</span>}
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">
+          Gym Routine Tracker
+        </h1>
+        <p className="text-center text-gray-500 mb-6">
+          Sign in with your email and password
+        </p>
+
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Your email"
+            value={email}
+            required
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          <input
+            type="password"
+            placeholder="Your password"
+            value={password}
+            required
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          {errorMsg && (
+            <p className="text-red-500 text-sm text-center">{errorMsg}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-2 rounded-lg text-white font-semibold transition ${
+              loading
+                ? "bg-blue-300 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+          >
+            {loading ? "Signing in..." : "Login"}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-gray-400 mt-6">
+          Powered by{" "}
+          <span className="font-semibold text-gray-600">Overeng</span>
+        </p>
+      </div>
     </div>
   );
 }
