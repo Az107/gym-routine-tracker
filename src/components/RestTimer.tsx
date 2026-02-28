@@ -1,5 +1,5 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
-import { useKV } from "@github/spark/hooks";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -47,10 +47,7 @@ export const RestTimer = forwardRef<RestTimerRef, RestTimerProps>(
     const [timeLeft, setTimeLeft] = useState(defaultDuration);
     const [isRunning, setIsRunning] = useState(false);
     const [duration, setDuration] = useState(defaultDuration);
-    const [autoStart, setAutoStart] = useKV<boolean>(
-      "rest-timer-auto-start",
-      false,
-    );
+    const [autoStart, setAutoStart] = useState<boolean>(false);
     const [showCustomTimerDialog, setShowCustomTimerDialog] = useState(false);
     const [customMinutes, setCustomMinutes] = useState(1);
     const [customSeconds, setCustomSeconds] = useState(30);

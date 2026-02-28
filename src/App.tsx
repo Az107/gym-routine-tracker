@@ -1,5 +1,4 @@
 import { useMemo, useRef, useState, useEffect } from "react";
-import { useKV } from "@github/spark/hooks";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
@@ -31,6 +30,29 @@ import { RestTimer, type RestTimerRef } from "@/components/RestTimer";
 import { FocusMode } from "@/components/FocusMode";
 import { gymRoutine } from "@/data/routine";
 import type { SetCompletion } from "@/types/routine";
+import { supabase } from "./lib/utils";
+import { User, UserResponse } from "@supabase/supabase-js";
+
+function useLocalStorageState<T>(key: string, initialValue: T) {
+  const [state, setState] = useState<T>(() => {
+    try {
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(key, JSON.stringify(state));
+    } catch {
+      console.warn("No se pudo guardar en localStorage", key);
+    }
+  }, [key, state]);
+
+  return [state, setState] as const;
+}
 
 function App() {
   const dayNames = [
@@ -45,11 +67,13 @@ function App() {
   const actualCurrentDay = dayNames[new Date().getDay()];
   const timerRef = useRef<RestTimerRef>(null);
   const [showDayNoteDialog, setShowDayNoteDialog] = useState(false);
-  const [overrideDay, setOverrideDay] = useKV<string | null>(
+  const [overrideDay, setOverrideDay] = useLocalStorageState<string | null>(
     "day-override",
     null,
   );
+  const [userName, setUserName] = useState<string | null>(null);
   const [focusModeOpen, setFocusModeOpen] = useState(false);
+  const [userData, setUserData] = useState<User | null>(null);
   const [focusModeIndex, setFocusModeIndex] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isTimerExpanded, setIsTimerExpanded] = useState(false);
@@ -58,9 +82,23 @@ function App() {
     isRunning: false,
   });
 
+  const handleBlur = () => {
+    if (userName && userName !== userData?.user_metadata.display_name) {
+      supabase.auth.updateUser({ data: { display_name: userName } });
+    }
+  };
+
   const currentDay = overrideDay || actualCurrentDay;
 
   useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      setUserData(user);
+      if (user!.user_metadata.display_name == null) {
+      } else {
+        setUserName(user.user_metadata.display_name ?? null);
+      }
+    });
     const handleScroll = () => {
       const scrollTop = window.scrollY;
 
@@ -102,15 +140,13 @@ function App() {
     }, {} as SetCompletion);
   }, [todayWorkout]);
 
-  const [completion, setCompletion] = useKV<SetCompletion>(
+  const [completion, setCompletion] = useLocalStorageState<SetCompletion>(
     `workout-completion-${currentDay}`,
     initialCompletion,
   );
 
-  const [treadmillCompleted, setTreadmillCompleted] = useKV<boolean>(
-    `treadmill-completion-${currentDay}`,
-    false,
-  );
+  const [treadmillCompleted, setTreadmillCompleted] =
+    useLocalStorageState<boolean>(`treadmill-completion-${currentDay}`, false);
 
   const handleSetToggle = (exerciseIndex: number, setIndex: number) => {
     setCompletion((currentCompletion) => {
@@ -235,11 +271,25 @@ function App() {
             )}
           </div>
 
-          <h1
-            className={`font-bold tracking-tight transition-all duration-300 overflow-hidden text-3xl mb-4 max-h-20 opacity-100`}
-          >
-            Today's Workout
-          </h1>
+          <div className="flex flex-row items-baseline gap-2 mb-4">
+            <h1 className="font-bold tracking-tight text-3xl transition-all duration-300">
+              Bienvenido{" "}
+            </h1>
+            <input
+              type="text"
+              value={userName ?? ""}
+              onChange={(e) => setUserName(e.target.value)}
+              onBlur={handleBlur}
+              placeholder="Tu nombre"
+              className="
+                font-bold tracking-tight text-3xl
+                bg-transparent border-none outline-none
+                text-gray-800 focus:ring-0
+                placeholder:text-gray-400
+                w-auto min-w-[4ch]
+              "
+            />
+          </div>
 
           <div className="space-y-2">
             <div
@@ -258,6 +308,7 @@ function App() {
       </div>
 
       <div
+        style={{ overflowAnchor: "none" }} // Prevents the page from jumping when scrolling
         className={`max-w-2xl mx-auto px-6 py-6 ${focusModeOpen ? "" : "pb-24"}`}
       >
         <div className="flex flex-col gap-4">
