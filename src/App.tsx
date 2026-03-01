@@ -16,16 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Barbell,
-  CalendarDots,
-  Info,
-  CaretDown,
-  Play,
-  Pause,
-} from "@phosphor-icons/react";
-import { ExerciseCard } from "@/components/ExerciseCard";
-import { TreadmillCard } from "@/components/TreadmillCard";
+import { Barbell, CalendarDots, Info, CaretDown } from "@phosphor-icons/react";
 import { RestTimer, type RestTimerRef } from "@/components/RestTimer";
 import { FocusMode } from "@/components/FocusMode";
 import { gymRoutine } from "@/data/routine";
@@ -49,10 +40,7 @@ function App() {
   const actualCurrentDay = dayNames[new Date().getDay()];
   const timerRef = useRef<RestTimerRef>(null);
   const [showDayNoteDialog, setShowDayNoteDialog] = useState(false);
-  const [overrideDay, setOverrideDay] = useLocalStorageState<string | null>(
-    "day-override",
-    null,
-  );
+  const [overrideDay, setOverrideDay] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [focusModeOpen, setFocusModeOpen] = useState(false);
   const [userData, setUserData] = useState<User | null>(null);
@@ -128,6 +116,10 @@ function App() {
   );
 
   const handleSetToggle = (exerciseIndex: number, setIndex: number) => {
+    if (exerciseIndex == -1) {
+      setTreadmillCompleted(true);
+      return;
+    }
     setCompletion((currentCompletion) => {
       const newCompletion = { ...currentCompletion };
       if (!newCompletion[exerciseIndex]) {
@@ -250,19 +242,21 @@ function App() {
             />
           </div>
 
-          <div className="space-y-2">
-            <div
-              className={`flex items-center justify-between text-sm transition-all duration-300 ${isScrolled ? "opacity-0 max-h-0 overflow-hidden" : "opacity-100 max-h-10"}`}
-            >
-              <span className="font-medium text-muted-foreground">
-                Progress
-              </span>
-              <span className="font-bold text-foreground">
-                {progressStats.completed} / {progressStats.total} items
-              </span>
+          {todayWorkout && (
+            <div className="space-y-2">
+              <div
+                className={`flex items-center justify-between text-sm transition-all duration-300 ${isScrolled ? "opacity-0 max-h-0 overflow-hidden" : "opacity-100 max-h-10"}`}
+              >
+                <span className="font-medium text-muted-foreground">
+                  Progress
+                </span>
+                <span className="font-bold text-foreground">
+                  {progressStats.completed} / {progressStats.total} items
+                </span>
+              </div>
+              <Progress value={progressStats.percentage} className="h-2" />
             </div>
-            <Progress value={progressStats.percentage} className="h-2" />
-          </div>
+          )}
         </div>
       </div>
 
@@ -278,7 +272,7 @@ function App() {
           />
         </div>
       ) : (
-        <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="bg-background px-3 flex items-center justify-center p-6 min-h-full">
           <Card className="max-w-md w-full p-8 text-center">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center">

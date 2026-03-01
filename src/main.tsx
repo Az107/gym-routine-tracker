@@ -13,7 +13,7 @@ import { ErrorFallback } from "./ErrorFallback.tsx";
 
 import "./main.css";
 import "./styles/theme.css";
-import "./index.css";
+
 import Logout from "./logout.tsx";
 
 function Root() {

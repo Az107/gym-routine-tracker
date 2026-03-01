@@ -14,18 +14,17 @@ interface ExerciseListProps {
   completion: any;
 }
 
-export function ExerciseList(props) {
+export function ExerciseList(props: ExerciseListProps) {
   const { exercises, onCompletion, completion } = props;
-  console.log(exercises);
   if (!exercises) return null;
 
   return (
     <div className="flex flex-col gap-4">
-      {/*<TreadmillCard
-          isCompleted={treadmillCompleted || false}
-        onComplete={setTreadmillCompleted}
+      <TreadmillCard
+        isCompleted={false}
+        onComplete={() => onCompletion(-1, 0)}
         onCardClick={() => handleCardClick(0)}
-      />*/}
+      />
 
       {exercises.map((exercise, index) => (
         <ExerciseCard

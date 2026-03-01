@@ -1,51 +1,56 @@
-import { useState } from 'react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Check, Info } from '@phosphor-icons/react'
-import { cn } from '@/lib/utils'
-import type { Exercise } from '@/types/routine'
+} from "@/components/ui/dialog";
+import { Check, Info } from "@phosphor-icons/react";
+import { cn } from "@/lib/utils";
+import type { Exercise } from "@/types/routine";
 
 interface ExerciseCardProps {
-  exercise: Exercise
-  exerciseIndex: number
-  completedSets: boolean[]
-  onSetToggle: (setIndex: number) => void
-  onCardClick?: () => void
-  isInFocusMode?: boolean
+  exercise: Exercise;
+  exerciseIndex: number;
+  completedSets: boolean[];
+  onSetToggle: (setIndex: number) => void;
+  onCardClick?: () => void;
+  isInFocusMode?: boolean;
 }
 
-export function ExerciseCard({ 
-  exercise, 
-  completedSets, 
+export function ExerciseCard({
+  exercise,
+  completedSets,
   onSetToggle,
   onCardClick,
-  isInFocusMode = false
+  isInFocusMode = false,
 }: ExerciseCardProps) {
-  const [showNoteDialog, setShowNoteDialog] = useState(false)
-  const allSetsCompleted = completedSets.every((completed) => completed)
-  const completedCount = completedSets.filter((completed) => completed).length
+  const [showNoteDialog, setShowNoteDialog] = useState(false);
+  const allSetsCompleted = completedSets.every((completed) => completed);
+  const completedCount = completedSets.filter((completed) => completed).length;
 
   return (
     <>
-      <Card 
+      <Card
         className={cn(
           "p-6 transition-all duration-300",
           allSetsCompleted && "bg-accent/5 border-accent/20",
-          !isInFocusMode && onCardClick && "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+          !isInFocusMode &&
+            onCardClick &&
+            "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]",
         )}
       >
         <div className="flex flex-col gap-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-start gap-2">
-                <h3   onClick={() => !isInFocusMode && onCardClick?.()} className="text-lg font-medium leading-tight flex-1">
+                <h3
+                  onClick={() => !isInFocusMode && onCardClick?.()}
+                  className="text-lg font-medium leading-tight flex-1"
+                >
                   {exercise.nombre}
                 </h3>
                 {exercise.nota && (
@@ -90,7 +95,7 @@ export function ExerciseCard({
                     "hover:scale-105 active:scale-95",
                     completedSets[index]
                       ? "bg-accent border-accent text-accent-foreground"
-                      : "bg-background border-border text-muted-foreground hover:border-primary/50"
+                      : "bg-background border-border text-muted-foreground hover:border-primary/50",
                   )}
                 >
                   {completedSets[index] ? (
@@ -116,5 +121,5 @@ export function ExerciseCard({
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

@@ -1,4 +1,3 @@
-import "./index.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { supabase } from "./lib/utils";

@@ -1,86 +1,103 @@
-import { useState, useEffect } from 'react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Play, Pause, ArrowCounterClockwise, Check } from '@phosphor-icons/react'
-import { cn } from '@/lib/utils'
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Play,
+  Pause,
+  ArrowCounterClockwise,
+  Check,
+  PersonSimpleRun,
+} from "@phosphor-icons/react";
+import { cn } from "@/lib/utils";
 
 interface TreadmillCardProps {
-  isCompleted: boolean
-  onComplete: (completed: boolean) => void
-  onCardClick?: () => void
-  isInFocusMode?: boolean
+  isCompleted: boolean;
+  onComplete: (completed: boolean) => void;
+  onCardClick?: () => void;
+  isInFocusMode?: boolean;
 }
 
-export function TreadmillCard({ isCompleted, onComplete, onCardClick, isInFocusMode = false }: TreadmillCardProps) {
-  const defaultDuration = 10 * 60
-  const [timeLeft, setTimeLeft] = useState(defaultDuration)
-  const [isRunning, setIsRunning] = useState(false)
-  const [duration] = useState(defaultDuration)
+export function TreadmillCard({
+  isCompleted,
+  onComplete,
+  onCardClick,
+  isInFocusMode = false,
+}: TreadmillCardProps) {
+  const defaultDuration = 10 * 60;
+  const [timeLeft, setTimeLeft] = useState(defaultDuration);
+  const [isRunning, setIsRunning] = useState(false);
+  const [duration] = useState(defaultDuration);
 
   useEffect(() => {
-    let interval: number | undefined
+    let interval: number | undefined;
 
     if (isRunning && timeLeft > 0) {
       interval = window.setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
-            setIsRunning(false)
-            onComplete(true)
-            return 0
+            setIsRunning(false);
+            onComplete(true);
+            return 0;
           }
-          return prev - 1
-        })
-      }, 1000)
+          return prev - 1;
+        });
+      }, 1000);
     }
 
     return () => {
-      if (interval) clearInterval(interval)
-    }
-  }, [isRunning, timeLeft, onComplete])
+      if (interval) clearInterval(interval);
+    };
+  }, [isRunning, timeLeft, onComplete]);
 
   const handlePlayPause = () => {
     if (timeLeft === 0) {
-      setTimeLeft(duration)
+      setTimeLeft(duration);
     }
-    setIsRunning(!isRunning)
-  }
+    setIsRunning(!isRunning);
+  };
 
   const handleReset = () => {
-    setIsRunning(false)
-    setTimeLeft(duration)
-    onComplete(false)
-  }
+    setIsRunning(false);
+    setTimeLeft(duration);
+    onComplete(false);
+  };
 
   const handleMarkComplete = () => {
-    onComplete(!isCompleted)
-  }
+    onComplete(!isCompleted);
+  };
 
-  const minutes = Math.floor(timeLeft / 60)
-  const seconds = timeLeft % 60
-  const progress = ((defaultDuration - timeLeft) / defaultDuration) * 100
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+  const progress = ((defaultDuration - timeLeft) / defaultDuration) * 100;
 
   return (
-    <Card className={cn(
-      "p-6 transition-all duration-300 relative overflow-hidden",
-      isCompleted && "bg-accent/5 border-accent/20",
-      !isInFocusMode && onCardClick && "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-    )}
-
+    <Card
+      className={cn(
+        "p-6 transition-all duration-300 relative overflow-hidden bg-linear-to-br from-primary to-secondary border-primary/20",
+        isCompleted && "bg-accent/5 border-accent/20",
+        !isInFocusMode &&
+          onCardClick &&
+          "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]",
+      )}
     >
-      <div 
-        className="absolute bottom-0 left-0 h-1 bg-accent transition-all duration-300"
+      <PersonSimpleRun
+        size={320}
+        className="z-0 absolute top-1/12 left-1 translate-x-2/5 fill-background"
+      />
+      <div
+        className="absolute bottom-0 left-0 h-1 bg-done transition-all duration-300"
         style={{ width: `${progress}%` }}
       />
-      
-      <div className="flex flex-col gap-4">
+
+      <div className="flex flex-col gap-4 z-1">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-secundary to-primary/80 flex items-center justify-center text-accent-foreground text-lg">
-                🏃
-              </div>
               <div>
-                <h3   onClick={() => !isInFocusMode && onCardClick?.()} className="text-lg font-semibold leading-tight">
+                <h3
+                  onClick={() => !isInFocusMode && onCardClick?.()}
+                  className="text-lg  text-secondary font-semibold leading-tight"
+                >
                   Treadmill Warmup
                 </h3>
                 <p className="text-sm text-muted-foreground">
@@ -90,7 +107,7 @@ export function TreadmillCard({ isCompleted, onComplete, onCardClick, isInFocusM
             </div>
           </div>
           {isCompleted && (
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent text-accent-foreground">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-done text-done-foreground">
               <Check weight="bold" size={20} />
             </div>
           )}
@@ -102,7 +119,8 @@ export function TreadmillCard({ isCompleted, onComplete, onCardClick, isInFocusM
               Time Remaining
             </span>
             <div className="text-4xl font-bold tracking-tighter tabular-nums">
-              {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+              {String(minutes).padStart(2, "0")}:
+              {String(seconds).padStart(2, "0")}
             </div>
           </div>
 
@@ -149,5 +167,5 @@ export function TreadmillCard({ isCompleted, onComplete, onCardClick, isInFocusM
         </Button>
       </div>
     </Card>
-  )
+  );
 }
