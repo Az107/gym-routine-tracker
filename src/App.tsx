@@ -105,7 +105,11 @@ function App() {
   const initialCompletion: SetCompletion = useMemo(() => {
     if (!todayWorkout) return {};
     return todayWorkout.ejercicios.reduce((acc, exercise, index) => {
-      acc[index] = Array(exercise.series).fill(false);
+      if (exercise.kind == "set") {
+        acc[index] = Array(exercise.sets).fill(false);
+      } else if (exercise.kind == "time") {
+        acc[index] = [false];
+      }
       return acc;
     }, {} as SetCompletion);
   }, [todayWorkout]);
@@ -116,15 +120,11 @@ function App() {
   );
 
   const handleSetToggle = (exerciseIndex: number, setIndex: number) => {
-    if (exerciseIndex == -1) {
-      setTreadmillCompleted(true);
-      return;
-    }
     setCompletion((currentCompletion) => {
       const newCompletion = { ...currentCompletion };
       if (!newCompletion[exerciseIndex]) {
         newCompletion[exerciseIndex] = Array(
-          todayWorkout?.ejercicios[exerciseIndex].series || 0,
+          todayWorkout?.ejercicios[exerciseIndex].sets || 0,
         ).fill(false);
       }
       newCompletion[exerciseIndex] = [...newCompletion[exerciseIndex]];
@@ -140,30 +140,26 @@ function App() {
     });
   };
 
-  const [treadmillCompleted, setTreadmillCompleted] =
-    useLocalStorageState<boolean>(`treadmill-completion-${currentDay}`, false);
-
   const progressStats = useMemo(() => {
     if (!todayWorkout || !completion)
       return { completed: 0, total: 0, percentage: 0 };
 
-    const total =
-      todayWorkout.ejercicios.reduce(
-        (sum, exercise) => sum + exercise.series,
-        0,
-      ) + 1;
+    const total = todayWorkout.ejercicios.reduce(
+      (sum, exercise) => sum + (exercise.kind == "time" ? 1 : exercise.sets),
+      0,
+    );
     const exercisesCompleted = Object.values(completion).reduce(
       (sum, sets) => sum + sets.filter((s: boolean) => s).length,
       0,
     );
-    const completed = exercisesCompleted + (treadmillCompleted ? 1 : 0);
+    const completed = exercisesCompleted;
 
     return {
       completed,
       total,
       percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
     };
-  }, [todayWorkout, completion, treadmillCompleted]);
+  }, [todayWorkout, completion]);
 
   return (
     <div className="min-h-screen bg-background">

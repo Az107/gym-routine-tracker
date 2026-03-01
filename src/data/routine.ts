@@ -1,4 +1,4 @@
-import type { Routine } from '@/types/routine'
+import type { Routine } from "@/types/routine";
 
 export const gymRoutine: Routine = {
   rutina: [
@@ -7,63 +7,151 @@ export const gymRoutine: Routine = {
       grupo_muscular: "Empuje",
       nota: "Pecho y Tríceps, prioriza técnica en press banca, no carga",
       ejercicios: [
-        { nombre: "Press banca", series: 4, repeticiones: 8, nota: "Peso controlado, aprende el movimiento" },
-        { nombre: "Press banca inclinado mancuernas", series: 3, repeticiones: 10 },
-        { nombre: "Contractor o máquina pecho", series: 3, repeticiones: 12 },
-        { nombre: "Tríceps polea", series: 3, repeticiones: 12 },
-        { nombre: "Plancha abdominal", series: 3, repeticiones: "30 segundos", nota: "Core - no negociar esto" }
-      ]
+        {
+          kind: "time",
+          name: "Cinta",
+          time: 600,
+        },
+        {
+          kind: "set",
+          name: "Press banca",
+          sets: 4,
+          reps: 8,
+          note: "Peso controlado, aprende el movimiento",
+        },
+        {
+          kind: "set",
+          name: "Press banca inclinado mancuernas",
+          sets: 3,
+          reps: 10,
+        },
+        { kind: "set", name: "Contractor o máquina pecho", sets: 3, reps: 12 },
+        { kind: "set", name: "Tríceps polea", sets: 3, reps: 12 },
+        {
+          kind: "set",
+          name: "Plancha abdominal",
+          sets: 3,
+          reps: "30 segundos",
+          note: "Core - no negociar esto",
+        },
+      ],
     },
     {
       dia: "Martes",
       grupo_muscular: "Tirón",
       nota: "Espalda y Bíceps, el remo es tu ejercicio más importante para los dolores de espalda",
       ejercicios: [
-        { nombre: "Remo polea baja", series: 4, repeticiones: 10, nota: "Ejercicio clave postural" },
-        { nombre: "Jalones al pecho agarre medio", series: 4, repeticiones: 10 },
-        { nombre: "Máquina de remo", series: 3, repeticiones: 12 },
-        { nombre: "Bíceps barra Z", series: 3, repeticiones: 10 },
-        { nombre: "Bíceps martillo mancuerna", series: 3, repeticiones: 10 },
-        { nombre: "Dead bug (suelo)", series: 3, repeticiones: 8, nota: "Core lumbar - ideal para teletrabajadores" }
-      ]
+        {
+          kind: "set",
+          name: "Remo polea baja",
+          sets: 4,
+          reps: 10,
+          note: "Ejercicio clave postural",
+        },
+        {
+          kind: "set",
+          name: "Jalones al pecho agarre medio",
+          sets: 4,
+          reps: 10,
+        },
+        { kind: "set", name: "Máquina de remo", sets: 3, reps: 12 },
+        { kind: "set", name: "Bíceps barra Z", sets: 3, reps: 10 },
+        { kind: "set", name: "Bíceps martillo mancuerna", sets: 3, reps: 10 },
+        {
+          kind: "set",
+          name: "Dead bug (suelo)",
+          sets: 3,
+          reps: 8,
+          note: "Core lumbar - ideal para teletrabajadores",
+        },
+      ],
     },
     {
       dia: "Miércoles",
       grupo_muscular: "Pierna",
       nota: "Día más exigente, empieza el peso muerto con poco peso y céntrate en la técnica",
       ejercicios: [
-        { nombre: "Peso muerto mancuernas o barra", series: 4, repeticiones: 6, nota: "Técnica ante todo, vídeo tu forma si puedes" },
-        { nombre: "Prensa", series: 4, repeticiones: 10 },
-        { nombre: "Extensiones de cuádriceps", series: 3, repeticiones: 15 },
-        { nombre: "Femoral tumbado", series: 3, repeticiones: 12 },
-        { nombre: "Gemelo de pie o sentado", series: 3, repeticiones: 20 }
-      ]
+        {
+          kind: "set",
+          name: "Peso muerto mancuernas o barra",
+          sets: 4,
+          reps: 6,
+          note: "Técnica ante todo, vídeo tu forma si puedes",
+        },
+        { kind: "set", name: "Prensa", sets: 4, reps: 10 },
+        { kind: "set", name: "Extensiones de cuádriceps", sets: 3, reps: 15 },
+        { kind: "set", name: "Femoral tumbado", sets: 3, reps: 12 },
+        { kind: "set", name: "Gemelo de pie o sentado", sets: 3, reps: 20 },
+      ],
     },
     {
       dia: "Jueves",
       grupo_muscular: "Hombro + Core",
       nota: "Hombro posterior es prioritario para corregir postura de ordenador",
       ejercicios: [
-        { nombre: "Press de hombro mancuernas sentado", series: 4, repeticiones: 10 },
-        { nombre: "Elevaciones laterales", series: 3, repeticiones: 12 },
-        { nombre: "Máquina hombro posterior (o pájaro con mancuernas)", series: 4, repeticiones: 12, nota: "Muy importante para cuello y postura" },
-        { nombre: "Trapecio barra (encogimientos)", series: 3, repeticiones: 12 },
-        { nombre: "Crunch en polea o abdominal máquina", series: 3, repeticiones: 15 },
-        { nombre: "Plancha lateral", series: 2, repeticiones: "20 segundos cada lado" }
-      ]
+        {
+          kind: "set",
+          name: "Press de hombro mancuernas sentado",
+          sets: 4,
+          reps: 10,
+        },
+        { kind: "set", name: "Elevaciones laterales", sets: 3, reps: 12 },
+        {
+          kind: "set",
+          name: "Máquina hombro posterior (o pájaro con mancuernas)",
+          sets: 4,
+          reps: 12,
+          note: "Muy importante para cuello y postura",
+        },
+        {
+          kind: "set",
+          name: "Trapecio barra (encogimientos)",
+          sets: 3,
+          reps: 12,
+        },
+        {
+          kind: "set",
+          name: "Crunch en polea o abdominal máquina",
+          sets: 3,
+          reps: 15,
+        },
+        {
+          kind: "set",
+          name: "Plancha lateral",
+          sets: 2,
+          reps: "20 segundos cada lado",
+        },
+      ],
     },
     {
       dia: "Viernes",
       grupo_muscular: "Espalda postural + Brazos + Cardio suave",
       nota: "Día más ligero para cerrar semana. Ideal para reforzar lo postural y rematar brazos",
       ejercicios: [
-        { nombre: "Remo en máquina o mancuerna unilateral", series: 3, repeticiones: 12, nota: "Foco en retracción escapular" },
-        { nombre: "Face pull en polea (o banda)", series: 4, repeticiones: 15, nota: "Ejercicio clave para cuello y manguito rotador" },
-        { nombre: "Tríceps francés mancuerna", series: 3, repeticiones: 12 },
-        { nombre: "Fondos en banco", series: 3, repeticiones: 12 },
-        { nombre: "Bíceps concentrado", series: 3, repeticiones: 12 },
-        { nombre: "Bici estática", series: 1, repeticiones: "10 minutos ritmo suave", nota: "Para activar circulación, no para quemar" }
-      ]
-    }
-  ]
-}
+        {
+          kind: "set",
+          name: "Remo en máquina o mancuerna unilateral",
+          sets: 3,
+          reps: 12,
+          note: "Foco en retracción escapular",
+        },
+        {
+          kind: "set",
+          name: "Face pull en polea (o banda)",
+          sets: 4,
+          reps: 15,
+          note: "Ejercicio clave para cuello y manguito rotador",
+        },
+        { kind: "set", name: "Tríceps francés mancuerna", sets: 3, reps: 12 },
+        { kind: "set", name: "Fondos en banco", sets: 3, reps: 12 },
+        { kind: "set", name: "Bíceps concentrado", sets: 3, reps: 12 },
+        {
+          name: "Bici estática",
+          kind: "time",
+          time: 60,
+          note: "Para activar circulación, no para quemar",
+        },
+      ],
+    },
+  ],
+};

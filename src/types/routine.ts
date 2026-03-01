@@ -1,21 +1,31 @@
 export interface Exercise {
-  nombre: string
-  series: number
-  repeticiones: number | string
-  nota?: string
+  name: string;
+  note?: string;
 }
 
+export interface ExerciseTime extends Exercise {
+  kind: "time";
+  time: number; // time in seconds
+}
+
+export interface ExerciseSet extends Exercise {
+  kind: "set";
+  sets: number;
+  reps: number | string;
+}
+export type AnyExercise = ExerciseTime | ExerciseSet;
+
 export interface WorkoutDay {
-  dia: string
-  grupo_muscular: string
-  nota?: string
-  ejercicios: Exercise[]
+  dia: string;
+  grupo_muscular: string;
+  nota?: string;
+  ejercicios: AnyExercise[];
 }
 
 export interface Routine {
-  rutina: WorkoutDay[]
+  rutina: WorkoutDay[];
 }
 
 export interface SetCompletion {
-  [exerciseIndex: number]: boolean[]
+  [exerciseIndex: number]: boolean[];
 }

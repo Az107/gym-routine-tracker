@@ -4,8 +4,8 @@ import { twMerge } from "tailwind-merge";
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL!;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY!;
+const supabaseUrl = import.meta.env!.VITE_SUPABASE_URL!;
+const supabaseAnonKey = import.meta.env!.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY!;
 
 // Singleton
 let supabaseInstance: ReturnType<typeof createClient> | null = null;
