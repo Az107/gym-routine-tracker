@@ -1,24 +1,29 @@
-import { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence, PanInfo, useMotionValue } from 'framer-motion'
-import { X, CaretLeft, CaretRight } from '@phosphor-icons/react'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import { MiniTimer } from '@/components/MiniTimer'
-import { type RestTimerRef } from '@/components/RestTimer'
-import type { Exercise } from '@/types/routine'
+import { useState, useRef, useEffect } from "react";
+import {
+  motion,
+  AnimatePresence,
+  PanInfo,
+  useMotionValue,
+} from "framer-motion";
+import { X, CaretLeft, CaretRight } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+import { type RestTimerRef } from "@/components/RestTimer";
+import type { Exercise } from "@/types/routine";
 
 interface FocusModeProps {
-  isOpen: boolean
-  onClose: () => void
-  initialIndex: number
-  exercises: Exercise[]
-  treadmillCompleted: boolean
-  onTreadmillComplete: (completed: boolean) => void
-  completedSets: Record<number, boolean[]>
-  onSetToggle: (exerciseIndex: number, setIndex: number) => void
-  renderTreadmill: () => React.ReactNode
-  renderExercise: (exercise: Exercise, index: number) => React.ReactNode
-  timerRef: React.RefObject<RestTimerRef | null>
+  isOpen: boolean;
+  onClose: () => void;
+  initialIndex: number;
+  exercises: Exercise[];
+  treadmillCompleted: boolean;
+  onTreadmillComplete: (completed: boolean) => void;
+  completedSets: Record<number, boolean[]>;
+  onSetToggle: (exerciseIndex: number, setIndex: number) => void;
+  renderTreadmill: () => React.ReactNode;
+  renderExercise: (exercise: Exercise, index: number) => React.ReactNode;
+  timerRef: React.RefObject<RestTimerRef | null>;
 }
 
 export function FocusMode({
@@ -30,63 +35,66 @@ export function FocusMode({
   renderExercise,
   timerRef,
 }: FocusModeProps) {
-  const [currentIndex, setCurrentIndex] = useState(initialIndex)
-  const x = useMotionValue(0)
-  const constraintsRef = useRef(null)
-  
-  const totalCards = exercises.length + 1
-  const canGoNext = currentIndex < totalCards - 1
-  const canGoPrev = currentIndex > 0
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const x = useMotionValue(0);
+  const constraintsRef = useRef(null);
+
+  const totalCards = exercises.length + 1;
+  const canGoNext = currentIndex < totalCards - 1;
+  const canGoPrev = currentIndex > 0;
 
   useEffect(() => {
     if (isOpen) {
-      setCurrentIndex(initialIndex)
-      document.body.style.overflow = 'hidden'
+      setCurrentIndex(initialIndex);
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = ''
+      document.body.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isOpen, initialIndex])
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, initialIndex]);
 
-  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const threshold = 50
-    const velocity = info.velocity.x
-    const offset = info.offset.x
+  const handleDragEnd = (
+    _: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) => {
+    const threshold = 50;
+    const velocity = info.velocity.x;
+    const offset = info.offset.x;
 
     if (offset > threshold || velocity > 500) {
       if (canGoPrev) {
-        setCurrentIndex(prev => prev - 1)
+        setCurrentIndex((prev) => prev - 1);
       }
     } else if (offset < -threshold || velocity < -500) {
       if (canGoNext) {
-        setCurrentIndex(prev => prev + 1)
+        setCurrentIndex((prev) => prev + 1);
       }
     }
-  }
+  };
 
   const handleNext = () => {
     if (canGoNext) {
-      setCurrentIndex(prev => prev + 1)
+      setCurrentIndex((prev) => prev + 1);
     }
-  }
+  };
 
   const handlePrev = () => {
     if (canGoPrev) {
-      setCurrentIndex(prev => prev - 1)
+      setCurrentIndex((prev) => prev - 1);
     }
-  }
+  };
 
   const getCurrentCard = () => {
     if (currentIndex === 0) {
-      return renderTreadmill()
+      return renderTreadmill();
     } else {
-      return renderExercise(exercises[currentIndex - 1], currentIndex - 1)
+      return renderExercise(exercises[currentIndex - 1], currentIndex - 1);
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
@@ -97,12 +105,7 @@ export function FocusMode({
         className="fixed inset-0 bg-background z-50 flex flex-col"
       >
         <div className="flex items-center justify-between px-4 py-4 border-b bg-background/95 backdrop-blur-sm">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="gap-2"
-          >
+          <Button variant="ghost" size="sm" onClick={onClose} className="gap-2">
             <X size={20} weight="bold" />
             Exit Focus
           </Button>
@@ -113,10 +116,7 @@ export function FocusMode({
           </div>
         </div>
 
-        <div
-          ref={constraintsRef}
-          className="flex-1 relative overflow-hidden"
-        >
+        <div ref={constraintsRef} className="flex-1 relative overflow-hidden">
           <motion.div
             drag="x"
             dragConstraints={constraintsRef}
@@ -125,7 +125,6 @@ export function FocusMode({
             style={{ x }}
             className="h-full flex items-center justify-center p-6 cursor-grab active:cursor-grabbing"
           >
-
             <div className="w-full max-w-2xl">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -173,7 +172,7 @@ export function FocusMode({
                 "h-2 rounded-full transition-all",
                 index === currentIndex
                   ? "w-8 bg-primary"
-                  : "w-2 bg-muted-foreground/30"
+                  : "w-2 bg-muted-foreground/30",
               )}
               aria-label={`Go to card ${index + 1}`}
             />
@@ -181,5 +180,5 @@ export function FocusMode({
         </div>
       </motion.div>
     </AnimatePresence>
-  )
+  );
 }

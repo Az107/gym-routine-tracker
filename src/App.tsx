@@ -30,29 +30,11 @@ import { RestTimer, type RestTimerRef } from "@/components/RestTimer";
 import { FocusMode } from "@/components/FocusMode";
 import { gymRoutine } from "@/data/routine";
 import type { SetCompletion } from "@/types/routine";
-import { supabase } from "./lib/utils";
+import { supabase, useLocalStorageState } from "./lib/utils";
 import { User, UserResponse } from "@supabase/supabase-js";
+import { ExerciseList } from "./components/ExerciseList";
 
-function useLocalStorageState<T>(key: string, initialValue: T) {
-  const [state, setState] = useState<T>(() => {
-    try {
-      const stored = localStorage.getItem(key);
-      return stored ? JSON.parse(stored) : initialValue;
-    } catch {
-      return initialValue;
-    }
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(key, JSON.stringify(state));
-    } catch {
-      console.warn("No se pudo guardar en localStorage", key);
-    }
-  }, [key, state]);
-
-  return [state, setState] as const;
-}
+const develop = true;
 
 function App() {
   const dayNames = [
@@ -145,9 +127,6 @@ function App() {
     initialCompletion,
   );
 
-  const [treadmillCompleted, setTreadmillCompleted] =
-    useLocalStorageState<boolean>(`treadmill-completion-${currentDay}`, false);
-
   const handleSetToggle = (exerciseIndex: number, setIndex: number) => {
     setCompletion((currentCompletion) => {
       const newCompletion = { ...currentCompletion };
@@ -169,10 +148,8 @@ function App() {
     });
   };
 
-  const handleCardClick = (index: number) => {
-    setFocusModeIndex(index);
-    setFocusModeOpen(true);
-  };
+  const [treadmillCompleted, setTreadmillCompleted] =
+    useLocalStorageState<boolean>(`treadmill-completion-${currentDay}`, false);
 
   const progressStats = useMemo(() => {
     if (!todayWorkout || !completion)
@@ -195,24 +172,6 @@ function App() {
       percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
     };
   }, [todayWorkout, completion, treadmillCompleted]);
-
-  if (!todayWorkout) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <Card className="max-w-md w-full p-8 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center">
-              <Barbell size={32} className="text-primary" />
-            </div>
-          </div>
-          <h2 className="text-2xl font-bold mb-2">Rest Day</h2>
-          <p className="text-muted-foreground">
-            No workout scheduled for {currentDay}. Enjoy your rest!
-          </p>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -257,9 +216,9 @@ function App() {
             </DropdownMenu>
             <Badge variant="secondary" className="font-semibold">
               <Barbell size={14} className="mr-1.5" weight="fill" />
-              {todayWorkout.grupo_muscular}
+              {todayWorkout?.grupo_muscular ?? "No Workout"}
             </Badge>
-            {todayWorkout.nota && (
+            {todayWorkout?.nota && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -307,63 +266,32 @@ function App() {
         </div>
       </div>
 
-      <div
-        style={{ overflowAnchor: "none" }} // Prevents the page from jumping when scrolling
-        className={`max-w-2xl mx-auto px-6 py-6 ${focusModeOpen ? "" : "pb-24"}`}
-      >
-        <div className="flex flex-col gap-4">
-          <TreadmillCard
-            isCompleted={treadmillCompleted || false}
-            onComplete={setTreadmillCompleted}
-            onCardClick={() => handleCardClick(0)}
+      {todayWorkout ? (
+        <div
+          style={{ overflowAnchor: "none" }} // Prevents the page from jumping when scrolling
+          className={`max-w-2xl mx-auto px-6 py-6 ${focusModeOpen ? "" : "pb-24"}`}
+        >
+          <ExerciseList
+            exercises={todayWorkout.ejercicios}
+            onCompletion={handleSetToggle}
+            completion={completion}
           />
-
-          {todayWorkout.ejercicios.map((exercise, index) => (
-            <ExerciseCard
-              key={index}
-              exercise={exercise}
-              exerciseIndex={index}
-              completedSets={
-                (completion && completion[index]) ||
-                Array(exercise.series).fill(false)
-              }
-              onSetToggle={(setIndex) => handleSetToggle(index, setIndex)}
-              onCardClick={() => handleCardClick(index + 1)}
-            />
-          ))}
         </div>
-      </div>
-
-      <FocusMode
-        isOpen={focusModeOpen}
-        onClose={() => setFocusModeOpen(false)}
-        initialIndex={focusModeIndex}
-        exercises={todayWorkout.ejercicios}
-        treadmillCompleted={treadmillCompleted || false}
-        onTreadmillComplete={setTreadmillCompleted}
-        completedSets={completion || {}}
-        onSetToggle={handleSetToggle}
-        timerRef={timerRef}
-        renderTreadmill={() => (
-          <TreadmillCard
-            isCompleted={treadmillCompleted || false}
-            onComplete={setTreadmillCompleted}
-            isInFocusMode
-          />
-        )}
-        renderExercise={(exercise, index) => (
-          <ExerciseCard
-            exercise={exercise}
-            exerciseIndex={index}
-            completedSets={
-              (completion && completion[index]) ||
-              Array(exercise.series).fill(false)
-            }
-            onSetToggle={(setIndex) => handleSetToggle(index, setIndex)}
-            isInFocusMode
-          />
-        )}
-      />
+      ) : (
+        <div className="min-h-screen bg-background flex items-center justify-center p-6">
+          <Card className="max-w-md w-full p-8 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center">
+                <Barbell size={32} className="text-primary" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold mb-2">Rest Day</h2>
+            <p className="text-muted-foreground">
+              No workout scheduled for {currentDay}. Enjoy your rest!
+            </p>
+          </Card>
+        </div>
+      )}
 
       <div
         className={`fixed bottom-0 w-full z-50 bg-card border-t transition-all duration-300 ${
@@ -386,9 +314,11 @@ function App() {
       <Dialog open={showDayNoteDialog} onOpenChange={setShowDayNoteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{todayWorkout.grupo_muscular}</DialogTitle>
+            <DialogTitle>
+              {todayWorkout?.grupo_muscular ?? "No group"}
+            </DialogTitle>
             <DialogDescription className="text-base pt-2">
-              {todayWorkout.nota}
+              {todayWorkout?.nota ?? "No note"}
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

@@ -15,8 +15,11 @@ import {
   Pause,
   ArrowCounterClockwise,
   Plus,
+  CaretUpIcon,
+  CaretUp,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { CaretDown, CaretDownIcon } from "@phosphor-icons/react/dist/ssr";
 
 interface RestTimerProps {
   defaultDuration?: number;
@@ -129,11 +132,18 @@ export const RestTimer = forwardRef<RestTimerRef, RestTimerProps>(
       <div className={cn("flex flex-col gap-4", className)}>
         {isTimerExpanded ? (
           <>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center w-full">
+              <Button
+                variant="ghost"
+                onClick={() => onToggleExpand()}
+                className="text-primary p-0 mr-2"
+              >
+                <CaretDownIcon size={32} />
+              </Button>
               <span className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
                 Rest Timer
               </span>
-              <div className="flex gap-1">
+              <div className="flex gap-1 ml-auto">
                 <button
                   onClick={() => setShowCustomTimerDialog(true)}
                   className="px-2 py-1 text-xs font-medium rounded transition-colors bg-secondary text-secondary-foreground hover:bg-secondary/80"
@@ -158,7 +168,6 @@ export const RestTimer = forwardRef<RestTimerRef, RestTimerProps>(
             </div>
 
             <div
-              onClick={() => onToggleExpand()}
               className={cn(
                 "text-5xl font-bold tracking-tighter transition-all",
                 isWarning && "animate-pulse text-destructive",
@@ -293,25 +302,25 @@ export const RestTimer = forwardRef<RestTimerRef, RestTimerProps>(
             </Dialog>
           </>
         ) : (
-          <div className="flex items-center justify-between">
-            <button
+          <div className="flex items-center justify-between gap-0">
+            <Button
+              variant="ghost"
               onClick={() => onToggleExpand()}
-              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              className="text-primary p-0 mr-2"
             >
-              <div
-                className={`text-2xl font-bold tracking-tighter transition-colors ${
-                  isRunning && timeLeft <= 5 && timeLeft > 0
-                    ? "animate-pulse text-destructive"
-                    : ""
-                }`}
-              >
-                {String(Math.floor(timeLeft / 60)).padStart(2, "0")}:
-                {String(timeLeft % 60).padStart(2, "0")}
-              </div>
-              <span className="text-sm font-medium text-muted-foreground">
-                Rest Timer
-              </span>
-            </button>
+              <CaretUp size={32} />
+              {/*CretUp is deprecated but CaretUpIcon dont show the icon */}
+            </Button>
+            <div
+              className={`text-3xl font-bold tracking-tighter transition-colors ${
+                isRunning && timeLeft <= 5 && timeLeft > 0
+                  ? "animate-pulse text-destructive"
+                  : ""
+              }`}
+            >
+              {String(Math.floor(timeLeft / 60)).padStart(2, "0")}:
+              {String(timeLeft % 60).padStart(2, "0")}
+            </div>
             <Button
               onClick={() => handlePlayPause()}
               size="sm"
